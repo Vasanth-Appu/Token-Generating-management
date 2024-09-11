@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRRO :: HOD Login</title>
+    <link rel="icon" href="logo/FRROimg.png" type="image/x-icon">
+    <link rel="shortcut icon" href="logo/FRROimg.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="//unpkg.com/alpinejs" defer></script>
+            <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+        
+
+    <!-- <link rel="stylesheet" href="login.css"> -->
+</head>
+
+<body>
+	 <!-- Loader Overlay -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Loader -->
+    <div class="loader-container" id="loader">
+        <div class="fading-bars">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+    </div>
+    <div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-md-offset-3 text-center">
+            <img src="logo/FRROimg.png" alt="FRRO Logo" class="logo-md" style="margin-bottom: -100px;">
+        </div>
+    </div>
+    <div class="row justify-content-center" style="margin-top: -20px;">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-default">
+                <h3 class="text-center" style="color: rgb(0, 128, 192); font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Head of the Department</h3>
+                <div class="panel-body">
+                    <form th:action="@{/Frro/hodauth}" method="post">
+                        <div class="form-group">
+                            <label for="adminId">User ID</label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        </div>
+                        <div th:if="${error}" x-data="{ showError: true }" x-init="setTimeout(() => showError = false, 2000)">
+                            <div x-show="showError" class="alert alert-danger">
+                                <span th:text="${error}"></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>
+<style>
+    
+
+  body {
+            background: linear-gradient(to top, #99ffcc 0%, #ffffff 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin: 0;
+        }.panel {
+    margin-top: 25%; /* Adjust as needed for proper alignment */
+    border-radius: 10px;
+            background: linear-gradient(to top, #99ffcc 0%, #ffffff 100%);
+    padding: 20px; /* Add padding for better content spacing */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    border: 1px solid #ddd; /* Optional border for better separation */
+}
+.form-control{
+    border-radius: 10px;
+}
+.form-control:focus {
+    border-color: rgb(153, 152, 152);
+    border-width: 2.5px;
+  
+    background-color: rgb(255, 255, 255);
+
+}
+.btn-block {
+    display: block;
+    width: 50%;
+    height: 40px;
+    margin-left: 25%;
+    margin-top: 32px;
+    background-color: #007bff; /* Default button color */
+    color: white; /* Button text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: box-shadow 0.3s ease-in-out; /* Smooth transition for shadow */
+}
+
+/* Hover effect */
+.btn-block:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+}
+
+/* Loader Container */
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: fixed; /* Ensures it covers the viewport */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999; /* Ensures it appears above the overlay */
+}
+
+/* Fading Bars */
+.fading-bars {
+    display: flex;
+    justify-content: space-between;
+    width: 80px;
+}
+
+.bar {
+    width: 10px;
+    height: 40px;
+    background-color: rgb(0, 255, 255);
+    animation: fade 1s infinite;
+}
+
+.bar:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.bar:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.bar:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.bar:nth-child(4) {
+    animation-delay: 0.6s;
+}
+
+.bar:nth-child(5) {
+    animation-delay: 0.8s;
+}
+
+/* Fade Animation */
+@keyframes fade {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+</style>
+<script>
+	window.onload = function() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        };
+</script> 

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FRRO</title>
+    <link rel="icon" href="logo/logo.png" type="image/x-icon">
+    <link rel="shortcut icon" href="logo/logo.png" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.10.2/dist/cdn.min.js" defer></script>
+
+    <style>
+        body {
+            background: linear-gradient(to top, #99ffcc 0%, #ffffff 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin: 0;
+        }
+        .card {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px;
+        }
+        .btn-custom {
+            margin: 10px 0;
+        }
+        .logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            background-color: transparent;
+        }
+        footer p a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        footer p a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <img src="/logo/logo.png" alt="FRRO Logo" class="logo-md">
+    <div class="card" style="background:linear-gradient( to top, #99ffcc 0%, #ffffff 100%);">
+        <div class="card-header bg-info text-black text-center" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">
+            FRRO Chennai
+        </div>
+        <div class="card-body text-center">
+            <h4 class="card-title">Welcome</h4>
+            <p class="card-text">Please choose an option below:</p>
+            <a href="/Frro/visitorprofile" class="btn btn-outline-success btn-block" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">VISITOR PROFILE</a>
+            <button type="button" class="btn btn-outline-secondary btn-block btn-custom" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;" data-toggle="modal" data-target="#reprintModal">REPRINT TOKEN</button>
+            <a href="/Frro/adminlogin" class="btn btn-outline-primary btn-block" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">ADMIN</a>
+
+        </div>
+    </div>
+
+    <!-- Reprint Token Modal -->
+    <div class="modal fade" id="reprintModal" tabindex="-1" role="dialog" aria-labelledby="reprintModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content" style="background:linear-gradient( to top, #99ffcc 0%, #ffffff 100%);" x-data="{ passportNo: '', contactNumber: '', tokenDisplay: '', errorMessage: '' }">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="reprintModalLabel">REPRINT TOKEN</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="location.reload()" style="color:red">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <h5>Please enter the details required to reprint the token.</h5>
+                    <form id="reprintForm">
+                        <div class="form-group">
+                            <label for="passportNo">PASSPORT NO:</label>
+                            <input type="text" class="form-control" id="passportNo" placeholder="Enter Your Passport No" x-model="passportNo" maxlength="20" oninput="this.value = this.value.toUpperCase()">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactNumber">Contact Number:</label>
+                            <input type="text" class="form-control" id="contactNumber" placeholder="Enter Your Indian Contact number eg:(1234567890)" maxlength="10" x-model="contactNumber">
+                        </div>
+                    </form>
+                    <div id="tokenDisplay" class="alert alert-success mt-4" x-show="tokenDisplay" x-text="tokenDisplay" style="color: darkgreen; font-size: medium;"></div>
+                    <div id="errorDisplay" class="alert alert-danger mt-4" x-show="errorMessage" x-text="errorMessage" style="color: red; font-size: medium;"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal" onclick="location.reload()">Close</button>
+                    <button type="button" class="btn btn-primary" id="reprintButton" x-bind:disabled="!(passportNo && contactNumber)"
+                        @click="submitReprint">Reprint</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            Developed by
+            <a href="https://tn.nic.in/" target="_blank"> NIC Chennai</a>
+        </p>
+    </footer>
+
+    <script>
+        function submitReprint() {
+            const passportNo = this.passportNo;
+            const contactNumber = this.contactNumber;
+
+            $.ajax({
+                type: 'POST',
+                url: '/reprint',
+                data: {
+                    passportNo: passportNo,
+                    contactNumber: contactNumber
+                },
+                success: (response) => {
+                    this.tokenDisplay =  response;
+                    this.errorMessage = '';
+                },
+                error: () => {
+                    this.errorMessage = 'Token does not exist (OR) your issue may be closed.';
+                    this.tokenDisplay = '';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

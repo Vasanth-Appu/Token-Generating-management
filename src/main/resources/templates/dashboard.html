@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>FRRO::Dashboard</title>
+    <link rel="icon" href="logo/FRROimg.png" type="image/x-icon">
+    <link rel="shortcut icon" href="logo/FRROimg.png" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.10.2/dist/cdn.min.js" defer></script>
+
+    <style>
+        /* Fixed Sidebar */
+        .sidebar {
+            height: 100vh;
+            width: 220px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgb(197, 197, 197);
+            padding-top: 20px;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: rgb(0, 0, 0);
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: rgb(177, 209, 216);
+        }
+
+        .sidebar .text-center {
+            margin-bottom: 20px;
+        }
+
+    .sidebar a.active {
+    background-color: rgb(77, 144, 155); /* Change this to the color you want for active */
+    color: white;
+}
+        .header {
+            position: fixed;
+            top: 0;
+            left: 220px;
+            width: calc(100% - 220px);
+            background-color: #17a2b8;
+            padding: 15px;
+            z-index: 900;
+            color: white;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header .title {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            z-index: 1100;
+        }
+
+        .profile img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .tooltip-custom {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            min-width: 180px;
+            z-index: 1100;
+        }
+
+        .tooltip-custom.show {
+            display: block;
+        }
+
+        .tooltip-custom p {
+            margin: 0;
+            padding: 5px 0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .tooltip-custom a {
+            display: flex;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            padding: 5px 0;
+            margin-top: 5px;
+        }
+
+        .tooltip-custom a:hover {
+            color: #007bff;
+        }
+
+        .tooltip-custom a i {
+            margin-right: 5px;
+        }
+
+        /* Main Content */
+        main {
+            margin-left: 220px;
+            margin-top: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+           <nav class="sidebar bg-info" x-data="{ currentPath: window.location.pathname }">
+    <div class="text-center">
+        <img src="/logo/logo.png" alt="FRRO Logo" class="img-fluid" style="width: 70px; height: 70px;">
+        <h4>FRRO</h4>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a :class="{ 'active': currentPath.includes('/dashboard') }" class="nav-link" href="/Frro/dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a :class="{ 'active': currentPath.includes('/authenticate') }" class="nav-link" href="/Frro/authenticate">
+                <i class="fas fa-users"></i>
+                Visitor List
+            </a>
+        </li>
+        <!-- Add other links as needed -->
+    </ul>
+</nav>
+
+
+            <!-- Main Content -->
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <!-- Header -->
+                <div class="header d-flex">
+                    <!-- Centered Title -->
+                    <div class="title">
+                        <h1>FRRO VISITORS</h1>
+                    </div>
+                    <!-- Profile Section -->
+                    <div class="profile d-flex align-items-center" x-data="{ open: false }" @click="open = !open">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkEBHtiXLReH_fW-qp_l6c7sUiP_41nY2xWQ&s" alt="Profile Picture">
+                        <div class="tooltip-custom" :class="{ 'show': open }">
+                            <p><strong>ADMIN</strong></p>
+                            <p th:text="${email}"></p>
+                            <a href="/Frro/adminlogin">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Sign Out
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            <div class="row">
+    
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Opened Tokens</div>
+                <div class="card-body">
+                    <h5 class="card-title">Total Open Tokens</h5>
+                    <p class="card-text">
+                        <span th:text="${openCount}">0</span>   
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Closed Token</div>
+                <div class="card-body">
+                    <h5 class="card-title">Total Closed Tokens</h5>
+                    <p class="card-text">
+                        <span th:text="${closeCount}">0</span>  
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            </main>
+        </div>
+    </div>
+
+</body>
+</html>

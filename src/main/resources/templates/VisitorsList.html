@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>FRRO::VisitorList</title>
+    <link rel="icon" href="logo/logo.png" type="image/x-icon">
+    <link rel="shortcut icon" href="logo/logo.png" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.10.2/dist/cdn.min.js" defer></script>
+    <style>
+/* Fixed Sidebar */
+        .sidebar {
+            height: 100vh;
+            width: 220px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgb(197, 197, 197);
+            padding-top: 20px;
+            z-index: 1000;
+            color: rgb(0, 0, 0);
+        }
+
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: rgb(0, 0, 0);
+            display: block;
+        }
+
+        .sidebar a:hover {
+            background-color: rgb(177, 209, 216);
+        }
+
+        .sidebar .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #f1f1f1;
+        }
+        .sidebar a.active {
+    background-color: rgb(77, 144, 155); /* Change this to the color you want for active */
+    color: white;
+}
+
+        /* Adjust the main content when the sidebar is present */
+        .main-content {
+            margin-left: 240px; /* width of the sidebar + some spacing */
+            padding: 20px;
+        }
+
+        .img-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .img-container img {
+            max-width: 50px;
+            max-height: 50px;
+            cursor: pointer;
+        }
+
+        .popup {
+            display: none;
+            position: absolute;
+            bottom: 110%;
+            left: -110%;
+            margin-top: 10px;
+            margin-left: 60px;
+            z-index: 10;
+            border: 0.2px solid rgb(255, 0, 0);
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            max-width: 150px;
+            max-height: 300px;
+        }
+
+        .popup img {
+            max-width: 150px;
+            max-height: 300px;
+        }
+
+        .img-container:hover .popup {
+            display: block;
+        }
+
+        .mb-4 {
+            color: rgb(0, 64, 128);
+        }
+
+        table td {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; /* Change font family */
+            font-size: 14px; /* Change font size */
+            color: #333; /* Change font color */
+        }
+       
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .icon-spacing {
+            margin-right: 10px;
+        }
+
+        .date-filters {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .date-filters label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .date-filters input {
+            margin-right: 15px;
+            border-radius: 4px;
+        }
+
+        .date-filters button {
+            border-radius: 4px;
+        }
+
+        /* Overlay */
+        .overlay {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+        }
+
+        /* Loader Container */
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+        }
+
+        /* Fading Bars */
+        .fading-bars {
+            display: flex;
+            justify-content: space-between;
+            width: 80px;
+        }
+
+        .bar {
+            width: 10px;
+            height: 40px;
+            background-color: rgb(0, 255, 255);
+            animation: fade 1s infinite;
+        }
+
+        .bar:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .bar:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .bar:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .bar:nth-child(4) {
+            animation-delay: 0.6s;
+        }
+
+        .bar:nth-child(5) {
+            animation-delay: 0.8s;
+        }
+
+        /* Fade Animation */
+        @keyframes fade {
+            0%, 100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 220px;
+            width: calc(100% - 220px);
+            background-color: #17a2b8;
+            padding: 15px;
+            z-index: 900;
+            color: white;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header .title {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            z-index: 1100;
+        }
+
+        .profile img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .tooltip-custom {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            min-width: 180px;
+            z-index: 1100;
+        }
+
+        .tooltip-custom.show {
+            display: block;
+        }
+
+        .tooltip-custom p {
+            margin: 0;
+            padding: 5px 0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .tooltip-custom a {
+            display: flex;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            padding: 5px 0;
+            margin-top: 5px;
+        }
+
+        .tooltip-custom a:hover {
+            color: #007bff;
+        }
+
+        .tooltip-custom a i {
+            margin-right: 5px;
+        }
+        /* Main Content */
+        main {
+            margin-left: 220px; /* Adjusts according to sidebar width */
+            margin-top: 120px; /* Adjusts for the header height */
+        }
+         .nav-tabs {
+            justify-content: center; /* Center the tabs horizontally */
+            margin-bottom: 1rem; /* Space between tabs and content */
+        }
+
+        .nav-tabs .nav-item {
+            margin: 0 1rem; /* Gap between individual tabs */
+        }
+
+        .nav-tabs .nav-link {
+            border: none; /* Remove default borders */
+            border-radius: 0; /* Remove border-radius */
+            font-weight: bold; /* Bold font */
+            color: #007bff; /* Default text color */
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #007bff; /* Active tab text color */
+            background-color: rgb(213, 253, 252); /* Background color for active tab */
+            border-bottom: 3px solid #007bff; /* Blue bottom border for active tab */
+            border-radius: 0; /* Remove border-radius for consistency */
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: #0056b3; /* Text color on hover */
+            background-color: rgba(0, 123, 255, 0.1); /* Light background on hover */
+        }
+
+        .badge {
+            font-size: 0.75rem; /* Font size for badges */
+            padding: 0.25em 0.4em; /* Padding for badges */
+        }
+    </style>
+</head>
+<body >
+    
+   <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+           <nav class="sidebar bg-info" x-data="{ currentPath: window.location.pathname }">
+    <div class="text-center">
+        <img src="/logo/logo.png" alt="FRRO Logo" class="img-fluid" style="width: 70px; height: 70px;">
+        <h4>FRRO</h4>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a :class="{ 'active': currentPath === '/Frro/dashboard' }" class="nav-link" href="/Frro/dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a :class="{ 'active': currentPath === '/Frro/authenticate' }" class="nav-link" href="/Frro/authenticate">
+                <i class="fas fa-users"></i>
+                Visitor List
+            </a>
+        </li>
+        <!-- Add other links as needed -->
+    </ul>
+</nav>
+   <!-- Main Content -->
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <!-- Header -->
+                <div class="header d-flex">
+                    <!-- Centered Title -->
+                    <div class="title">
+                        <h1>FRRO VISITORS</h1>
+                    </div>
+                    <!-- Profile Section -->
+                    <div class="profile d-flex align-items-center" x-data="{ open: false }" @click="open = !open">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkEBHtiXLReH_fW-qp_l6c7sUiP_41nY2xWQ&s" alt="Profile Picture">
+                        <div class="tooltip-custom" :class="{ 'show': open }">
+                            <p><strong>ADMIN</strong></p>
+                            <p th:text="${email}"></p>
+                            <a href="/Frro/adminlogin">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Sign Out
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!--visitor contents-->
+                <div class="pt-3 pb-2 mb-3 border-bottom ">
+        
+            <h2>Visitor List</h2>
+             <!-- Error Alert -->
+    <div th:if="${error}" x-data="{ showError: true }" x-init="setTimeout(() => showError = false, 5000)">
+        <div x-show="showError" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+
+    <!-- Success Alert -->
+    <div th:if="${message2}" x-data="{ showMessage: true }" x-init="setTimeout(() => showMessage = false, 5000)">
+        <div x-show="showMessage" class="alert alert-success">
+            <span th:text="${message2}"></span>
+        </div>
+    </div>            
+<form th:action="@{/Frro/filterByDate}" method="post">
+    <div class="date-filters">
+        <label for="fromDate">From:</label>
+        <input type="text" id="fromDate" name="fromDate" class="form-control-sm" th:value="${fromDate}" >
+        
+        <label for="endDate">To:</label>
+        <input type="text" id="endDate" name="endDate" class="form-control-sm"  th:value="${endDate}">
+        
+            <button type="submit" class="btn btn-primary btn-sm" onclick="applyDateFilter()">Apply</button>
+    
+            
+    </div>
+</form>
+<!-- date filter msg -->
+                        <div th:if="${message}" x-data="{ showMessage: true }" x-init="setTimeout(() => showMessage = false, 3000)">
+        <div x-show="showMessage" class="alert alert-danger">
+            <span th:text="${message}"></span>
+        </div>
+                        </div>
+
+       <!-- Bootstrap Tabs -->
+         <ul class="nav nav-tabs " id="nav-tab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="open-tab" data-toggle="pill" href="#open-visitors" role="tab" aria-controls="open-visitors" aria-selected="true" style="color: rgb(254, 89, 89);">OPEN <span class="badge badge-warning" th:text="${openCount}"></span></a>
+                             
+
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="closed-tab" data-toggle="pill" href="#closed-visitors" role="tab" aria-controls="closed-visitors" aria-selected="false" style="color: rgb(15, 146, 3);">CLOSED <span class="badge badge-warning" th:text="${closeCount}"></a>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="visitor-status-tabs-content">
+    <!-- Open Visitors Tab -->
+    <div class="tab-pane fade show active" id="open-visitors" role="tabpanel" aria-labelledby="open-tab">
+        <table class="table table-sm table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <!-- Table Headers -->
+                    <th>Visitor Photo</th>
+                    <th>Daily Token</th>
+                    <th>Full Name</th>
+                    <th>Address</th>
+                    <th>Applicant Full Name</th>
+                    <th>Passport No</th>
+                    <th>Nationality</th>
+                    <th>Local Contact</th>
+                    <th>Actions</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="visitor : ${visitors}" th:if="${visitor.solver_name == null || visitor.solver_name == ''}">
+                    <!-- Table Data -->
+                    <td>
+                        <div class="img-container">
+                            <img th:src="'data:image/jpeg;base64,' + ${visitor.imageBase64}" alt="visitor_img">
+                            <div class="popup">
+                                <img th:src="'data:image/jpeg;base64,' + ${visitor.imageBase64}" alt="NO image">
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${visitor.dailyToken}"></td>
+                    <td th:text="${visitor.visitor_full_name}"></td>
+                    <td th:text="${visitor.visitor_address}"></td>
+                    <td th:text="${visitor.applicant_full_name}"></td>
+                    <td th:text="${visitor.applicant_ppt_no}"></td>
+                    <td th:text="${visitor.applicant_nationality}"></td>
+                    <td th:text="${visitor.visitor_contact_no_india}"></td>
+                    <td>
+                        <!-- Actions Column -->
+                        <i class="fas fa-pen action-icon icon-spacing" title="Edit visitor" style="color: blue; margin-left: 20px;" 
+                            data-toggle="modal" data-target="#viewVisitorModal" 
+                            th:attr="data-image='data:image/jpeg;base64,' + ${visitor.imageBase64},
+                                      data-name=${visitor.visitor_full_name},
+                                      data-genid=${visitor.genId},
+                                      data-dailytoken=${visitor.dailyToken},
+                                      data-applicantname=${visitor.applicant_full_name},
+                                      data-address=${visitor.visitor_address},
+                                      data-passportno=${visitor.applicant_ppt_no},
+                                      data-contactno=${visitor.visitor_contact_no_india},
+                                      data-contactnointl=${visitor.visitor_contact_no_intnl},
+                                      data-nationality=${visitor.applicant_nationality},
+                                      data-country=${visitor.visitor_country_code_num},
+                                      data-time=${visitor.formattedTimestamp},
+                                      data-visitor_id=${visitor.visitor_id_type},
+                                      data-solvername=${visitor.solver_name},
+                                      data-remarks=${visitor.visitor_remarks},
+                                      data-purpose=${visitor.visit_purpose_other_desc}"
+                            @click="setVisitorDetails"></i>
+                    </td>
+                    <td>OPEN</td>
+                </tr>
+            </tbody>
+        </table>
+     
+    </div>
+
+    <!-- Closed Visitors Tab -->
+    <div class="tab-pane fade" id="closed-visitors" role="tabpanel" aria-labelledby="closed-tab">
+        <table class="table table-sm table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <!-- Table Headers -->
+                    <th>Visitor Photo</th>
+                    <th>Daily Token</th>
+                    <th>Full Name</th>
+                    <th>Address</th>
+                    <th>Applicant Full Name</th>
+                    <th>Passport No</th>
+                    <th>Nationality</th>
+                    <th>Local Contact</th>
+                    <th>Actions</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="visitor : ${visitors}" th:if="${visitor.solver_name != null && visitor.solver_name != ''}">
+                    <!-- Table Data -->
+                    <td>
+                        <div class="img-container">
+                            <img th:src="'data:image/jpeg;base64,' + ${visitor.imageBase64}" alt="visitor_img">
+                            <div class="popup">
+                                <img th:src="'data:image/jpeg;base64,' + ${visitor.imageBase64}" alt="NO image">
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${visitor.dailyToken}"></td>
+                    <td th:text="${visitor.visitor_full_name}"></td>
+                    <td th:text="${visitor.visitor_address}"></td>
+                    <td th:text="${visitor.applicant_full_name}"></td>
+                    <td th:text="${visitor.applicant_ppt_no}"></td>
+                    <td th:text="${visitor.applicant_nationality}"></td>
+                    <td th:text="${visitor.visitor_contact_no_india}"></td>
+                    <td>
+                        <!-- Actions Column -->
+                        <i class="fas fa-eye action-icon icon-spacing" title="View visitor" style="color: blue; margin-left: 20px;" 
+                            data-toggle="modal" data-target="#viewVisitorModal" 
+                            th:attr="data-image='data:image/jpeg;base64,' + ${visitor.imageBase64},
+                                      data-name=${visitor.visitor_full_name},
+                                      data-genid=${visitor.genId},
+                                      data-dailytoken=${visitor.dailyToken},
+                                      data-applicantname=${visitor.applicant_full_name},
+                                      data-address=${visitor.visitor_address},
+                                      data-passportno=${visitor.applicant_ppt_no},
+                                      data-contactno=${visitor.visitor_contact_no_india},
+                                      data-contactnointl=${visitor.visitor_contact_no_intnl},
+                                      data-nationality=${visitor.applicant_nationality},
+                                      data-country=${visitor.visitor_country_code_num},
+                                      data-time=${visitor.formattedTimestamp},
+                                      data-visitor_id=${visitor.visitor_id_type},
+                                      data-solvername=${visitor.solver_name},
+                                      data-remarks=${visitor.visitor_remarks},
+                                      data-purpose=${visitor.visit_purpose_other_desc}"
+
+                            @click="setVisitorDetails"></i>
+                    </td>
+                    <td>CLOSED</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Combined Modal -->
+<div class="modal fade" id="viewVisitorModal" tabindex="-1" role="dialog" aria-labelledby="viewVisitorModal" aria-hidden="true" data-backdrop="static" x-data="setVisitorDetails()">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewVisitorModal" style="font-family: monospace;">VISITOR DETAILS & REMARKS</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: red;" onclick="window.location.reload()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true">Visitor Details</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="remarks-tab" data-toggle="tab" href="#remarks" role="tab" aria-controls="remarks" aria-selected="false">Visitor Remarks</a>
+                    </li>
+                </ul>
+
+                <!-- Tab content -->
+                <div class="tab-content" id="myTabContent">
+                    <!-- Visitor Details Tab -->
+                    <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="image-preview-container">
+                                        <img :src="visitor.image || 'NA'" class="img-thumbnail" style="width: 150px; height: 200px; border-color: rgb(90, 224, 224); border-radius: 5px; border-width: 2.5px;" alt="Visitor Image">
+                                        <label for="webcamPreview" class="form-label" style="padding: 5px; margin-left: 15px; color: rgb(232, 79, 217);">
+                                            <span class="glyphicon glyphicon-file"></span> Image Preview
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h5><span x-text="visitor.name || 'NA'" style="color: green; font-family: Georgia, 'Times New Roman', Times, serif;"></span></h5>
+                                    <p>GenID: <span class="bold" x-text="visitor.genid || 'NA'"></span></p>
+                                    <p>Daily Token No: <span class="bold" x-text="visitor.dailyToken || 'NA'"></span></p>
+                                    <p>Visitor ID: <span class="bold" x-text="visitor.visitor_id || 'NA'"></span></p>
+                                    <p>Applicant Name: <span class="bold" x-text="visitor.applicantName || 'NA'"></span></p>
+                                    <p>Address: <span class="bold" x-text="visitor.address || 'NA'"></span></p>
+                                    <p>Passport No: <span class="bold" x-text="visitor.passportNo || 'NA'"></span></p>
+                                    <p>Nationality: <span class="bold" x-text="visitor.nationality || 'NA'"></span></p>
+                                    <p>Contact: <span class="bold" x-text="visitor.contactNo || 'NA'"></span></p>
+                                     <p>Purpose: <span class="bold" x-text="visitor.purpose || 'NA'"></span></p>
+
+                                    <p>Time Date: <span class="bold" x-text="visitor.time || 'NA'" style="color: crimson;"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visitor Remarks Tab -->
+                    <div class="tab-pane fade" id="remarks" role="tabpanel" aria-labelledby="remarks-tab">
+                        <form id="remarksForm" th:action="@{/Frro/updateRemarksAjax}" >
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p>Full Name: <span x-text="visitor.name || 'NA'" style="font-family: 'Times New Roman', Times, serif; color: green;"></span></p>
+                                        <!-- Hidden input to store visitor full name -->
+                                        <input type="hidden" name="visitor_full_name" x-bind:value="visitor.name"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>Passport Number: <span x-text="visitor.passportNo || 'NA'" style="font-family: 'Times New Roman', Times, serif; color: green;"></span></p>
+                                        <input type="hidden" name="applicant_ppt_no" x-bind:value="visitor.passportNo"/>
+                                    </div>
+                                </div>
+                                
+<!-- Conditional display of remarks -->
+<template x-if="visitor.remarks">
+    <div>
+        <label class="form-label" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; color: rgb(0, 0, 160);">
+            REMARKS: <span x-text="visitor.remarks"></span>
+        </label>
+    </div>
+</template>
+
+<template x-if="!visitor.remarks">
+    <div class="form-group">
+        <label for="visitorDetails" class="form-label">REMARKS:</label>
+        <textarea class="form-control" id="visitorDetails" name="visitor_remarks" rows="4" placeholder="Enter Remarks details" oninput="this.value = this.value.toUpperCase()" required></textarea>
+    </div>
+</template>
+
+<!-- Conditional display of solver name -->
+<template x-if="visitor.solvername">
+    <div>
+        <label class="form-label" style="font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; color: rgb(0, 128, 192);">
+            SOLVED BY: <span x-text="visitor.solvername"></span>
+        </label>
+    </div>
+</template>
+
+<template x-if="!visitor.solvername">
+    <div class="form-group">
+        <label for="solvedBy" class="form-label">Solved By:</label>
+        <input type="text" class="form-control" id="solvedBy" name="solver_name" placeholder="Enter the solver's name" oninput="this.value = this.value.toUpperCase()" required>
+    </div>
+</template>
+
+  <div class="modal-footer">
+	  <button type="button" id="saveButton" class="btn btn-primary" onclick="submitRemarks()" disabled>Save Changes</button>
+
+                            </div>
+                        </form>
+                        <div id="message" style="margin-top: 15px; font-family: Georgia, 'Times New Roman', Times, serif;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+            </main>
+    </div>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    // Initialize visitor details for modal display
+    function setVisitorDetails() {
+        return {
+            visitor: {
+                image: '',
+                name: '',
+                genid: '',
+                dailyToken: '',
+                applicantName: '',
+                address: '',
+                passportNo: '',
+                nationality: '',
+                contactNo: '',
+                time: '',
+                visitor_id: '',
+                solvername: '',
+                remarks: '',
+                purpose:'',
+            },
+            init() {
+                $('#viewVisitorModal').on('show.bs.modal', (event) => {
+                    const button = $(event.relatedTarget);
+                    this.visitor.image = button.data('image');
+                    this.visitor.name = button.data('name');
+                    this.visitor.genid = button.data('genid');
+                    this.visitor.dailyToken = button.data('dailytoken');
+                    this.visitor.applicantName = button.data('applicantname');
+                    this.visitor.address = button.data('address');
+                    this.visitor.passportNo = button.data('passportno');
+                    this.visitor.nationality = button.data('nationality');
+                    this.visitor.contactNo = button.data('contactno');
+                    this.visitor.time = button.data('time');
+                    this.visitor.visitor_id = button.data('visitor_id');
+                    this.visitor.solvername = button.data('solvername');
+                    this.visitor.remarks = button.data('remarks');
+                   this.visitor.purpose = button.data('purpose');
+
+                });
+            }
+        };
+    }
+
+    // Initialize visitor details for editing
+    function editVisitor() {
+        return {
+            visitor: {
+                name: '',
+                passportNo: ''
+            },
+            init() {
+                $('#editVisitorModal-lg').on('show.bs.modal', (event) => {
+                    const button = $(event.relatedTarget);
+                    this.visitor.name = button.data('name');
+                    this.visitor.passportNo = button.data('passportno');
+                });
+            }
+        };
+    }
+
+    // Apply date filter functionality
+    function applyDateFilter() {
+        const fromDate = document.getElementById('fromDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!fromDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+
+        // Implement your date filter logic here
+        console.log('From Date:', startDate);
+        console.log('End Date:', endDate);
+    }
+
+    // Hide overlay and show content when the page loads
+    window.onload = function() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+    };
+
+    // Display console logs for debugging
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("Visitor Name:", document.querySelector("span").textContent);
+        console.log("Hidden Input Value:", document.querySelector("input[type='hidden']").value);
+    });
+
+    // Submit remarks with AJAX
+    function submitRemarks() {
+        const form = document.getElementById('remarksForm');
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const messageDiv = document.getElementById('message');
+            if (data.status === "success") {
+                messageDiv.innerHTML = `<p style="color:green;">${data.message}</p>`;
+                // Optionally, update other parts of the page or modal here
+            } else {
+                messageDiv.innerHTML = `<p style="color:red;">${data.message}</p>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('message').innerHTML = `<p style="color:red;">An error occurred while updating the remarks.</p>`;
+        });
+    }
+
+    // Enable or disable the save button based on form input
+    $(document).ready(function() {
+        function checkFormFields() {
+            const remarksFilled = $('#visitorDetails').val().trim() !== '';
+            const solverNameFilled = $('#solvedBy').val().trim() !== '';
+
+            if (remarksFilled && solverNameFilled) {
+                $('#saveButton').prop('disabled', false);
+                $('#solverNameError').hide();
+            } else {
+                $('#saveButton').prop('disabled', true);
+                if (!solverNameFilled) {
+                    $('#solverNameError').show();
+                }
+            }
+        }
+
+        // Initial check on page load
+        checkFormFields();
+
+        // Check when the 'remarks' or 'solvedBy' inputs are updated
+        $('#visitorDetails, #solvedBy').on('input', function() {
+            checkFormFields();
+        });
+
+        // Additional check for 'solvedBy' input
+        $('#solvedBy').on('input', function() {
+            if ($(this).val().trim() !== '') {
+                $('#saveButton').prop('disabled', false);
+                $('#solverNameError').hide();
+            } else {
+                $('#saveButton').prop('disabled', true);
+                $('#solverNameError').show();
+            }
+        });
+    });
+      flatpickr("#fromDate , #endDate", {
+        dateFormat: "d/m/Y", // Set the format to dd/mm/yyyy
+        allowInput: true
+    });
+
+   
+     
+</script>
+
+</body>
+</html>
+
